@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/mdlayher/netlink/nlenc"
+	"github.com/twistlock/netlink/nlenc"
 )
 
 // Flags which may apply to netlink attribute types when communicating with

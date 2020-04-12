@@ -3,9 +3,9 @@ package netlink_test
 import (
 	"log"
 
-	"github.com/mdlayher/netlink"
-	"github.com/mdlayher/netlink/nlenc"
-	"github.com/mdlayher/netlink/nltest"
+	"github.com/twistlock/netlink"
+	"github.com/twistlock/netlink/nlenc"
+	"github.com/twistlock/netlink/nltest"
 )
 
 // This example demonstrates using a netlink.Conn to execute requests against

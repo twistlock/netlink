@@ -14,8 +14,8 @@ import (
 	"time"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/mdlayher/netlink"
-	"github.com/mdlayher/netlink/nlenc"
+	"github.com/twistlock/netlink"
+	"github.com/twistlock/netlink/nlenc"
 	"golang.org/x/net/bpf"
 	"golang.org/x/sys/unix"
 )

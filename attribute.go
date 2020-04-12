@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/mdlayher/netlink/nlenc"
+	"github.com/twistlock/netlink/nlenc"
 )
 
 // errInvalidAttribute specifies if an Attribute's length is incorrect.

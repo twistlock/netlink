@@ -565,6 +565,14 @@ type Config struct {
 	// no multicast group subscriptions will be made.
 	Groups uint32
 
+	// DisableNSGoroutine disables the goroutine that allows switching to a different
+	// network namespace. This forces running netlink socket syscalls in the caller thread's netns.
+	//
+	// Users who manage namespace transitions manually, or do not require them at all should
+	// set this to true, otherwise overhead will be incurred due to context switches and channel communication
+	// for the executed system calls.
+	DisableNSGoroutine bool
+
 	// NetNS specifies the network namespace the Conn will operate in.
 	//
 	// If set (non-zero), Conn will enter the specified network namespace and

@@ -328,24 +328,59 @@ func newError(errno int) error {
 
 var _ socket = &sysSocket{}
 
+// netNSRunner runs a function in a network namespace
+type netNSRunner interface {
+	// stop stops the runner
+	stop()
+	// run runs the given function in a network namespace of the runner
+	run(f func())
+}
+
 // A sysSocket is a socket which uses system calls for socket operations.
 type sysSocket struct {
 	mu     sync.RWMutex
 	fd     *os.File
 	closed bool
-	g      *lockedNetNSGoroutine
+	runner netNSRunner
+}
+
+// selfNetNSRunner executes functions in the current network namespace
+type selfNetNSRunner struct{}
+
+func (l *selfNetNSRunner) stop() {
+	// Empty impl to appease the netNSRunner interface
+	return
+}
+
+func (l *selfNetNSRunner) run(f func()) {
+	// Run the given function directly in the caller thread
+	f()
+}
+
+func newSelfNetNSExecutor() *selfNetNSRunner {
+	return &selfNetNSRunner{}
 }
 
 // newSysSocket creates a sysSocket that optionally locks its internal goroutine
 // to a single thread.
 func newSysSocket(config *Config) (*sysSocket, error) {
-	// Determine network namespaces using the threadNetNS function.
-	g, err := newLockedNetNSGoroutine(config.NetNS, threadNetNS, !config.DisableNSLockThread)
-	if err != nil {
-		return nil, err
+	var runner netNSRunner
+	var err error
+
+	if config.DisableNSGoroutine {
+		if config.NetNS != 0 {
+			return nil, errors.New("netlink Conn attempted to set a namespace with NS goroutine disabled")
+		}
+		runner = newSelfNetNSExecutor()
+	} else {
+		// Determine network namespaces using the threadNetNS function.
+		if runner, err = newLockedNetNSGoroutine(config.NetNS, threadNetNS, !config.DisableNSLockThread); err != nil {
+			return nil, err
+		}
 	}
+
 	return &sysSocket{
-		g: g,
+		runner: runner,
 	}, nil
 }
 
@@ -360,7 +395,7 @@ func (s *sysSocket) do(f func()) error {
 		return syscall.EBADF
 	}
 
-	s.g.run(f)
+	s.runner.run(f)
 	return nil
 }
 
@@ -374,7 +409,7 @@ func (s *sysSocket) read(f func(fd int) bool) error {
 	}
 
 	var err error
-	s.g.run(func() {
+	s.runner.run(func() {
 		err = fdread(s.fd, f)
 	})
 	return err
@@ -390,7 +425,7 @@ func (s *sysSocket) write(f func(fd int) bool) error {
 	}
 
 	var err error
-	s.g.run(func() {
+	s.runner.run(func() {
 		err = fdwrite(s.fd, f)
 	})
 	return err
@@ -406,7 +441,7 @@ func (s *sysSocket) control(f func(fd int)) error {
 	}
 
 	var err error
-	s.g.run(func() {
+	s.runner.run(func() {
 		err = fdcontrol(s.fd, f)
 	})
 	return err
@@ -508,7 +543,7 @@ func (s *sysSocket) Close() error {
 	s.closed = true
 
 	// Stop the associated goroutine and wait for it to return.
-	s.g.stop()
+	s.runner.stop()
 
 	return err
 }
@@ -643,7 +678,7 @@ type lockedNetNSGoroutine struct {
 // specified network namespace netNS (by file descriptor), and will use the
 // getNS function to produce netNS handles.
 func newLockedNetNSGoroutine(netNS int, getNS func() (*netNS, error), lockThread bool) (*lockedNetNSGoroutine, error) {
-	// Any bare syscall errors (e.g. setns) should be wrapped with
+	// Any bare syscall errors (e.runner. setns) should be wrapped with
 	// os.NewSyscallError for the remainder of this function.
 
 	// If the caller has instructed us to not lock OS thread but also attempts

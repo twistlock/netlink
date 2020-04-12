@@ -8,8 +8,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/mdlayher/netlink"
-	"github.com/mdlayher/netlink/nltest"
+	"github.com/twistlock/netlink"
+	"github.com/twistlock/netlink/nltest"
 )
 
 func TestConnExecute(t *testing.T) {

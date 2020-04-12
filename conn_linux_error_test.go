@@ -8,9 +8,9 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/mdlayher/netlink"
-	"github.com/mdlayher/netlink/nlenc"
-	"github.com/mdlayher/netlink/nltest"
+	"github.com/twistlock/netlink"
+	"github.com/twistlock/netlink/nlenc"
+	"github.com/twistlock/netlink/nltest"
 	"golang.org/x/sys/unix"
 )
 
