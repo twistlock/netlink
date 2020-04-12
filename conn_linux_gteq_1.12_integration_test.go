@@ -12,7 +12,7 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/jsimonetti/rtnetlink/rtnl"
-	"github.com/mdlayher/netlink"
+	"github.com/twistlock/netlink"
 	"golang.org/x/sys/unix"
 )
 

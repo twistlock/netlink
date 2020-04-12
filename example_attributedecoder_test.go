@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/mdlayher/netlink"
+	"github.com/twistlock/netlink"
 )
 
 // decodeNested is a nested structure within decodeOut.

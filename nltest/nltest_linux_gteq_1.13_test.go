@@ -7,8 +7,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/mdlayher/netlink"
-	"github.com/mdlayher/netlink/nltest"
+	"github.com/twistlock/netlink"
+	"github.com/twistlock/netlink/nltest"
 	"golang.org/x/sys/unix"
 )
 
